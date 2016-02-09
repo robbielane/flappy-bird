@@ -6,7 +6,7 @@ describe('Pipe', function(){
     it('has correct default attributes', function(){
       var pipe = new Pipe();
 
-      assert.equal(pipe.width, 75);
+      assert.equal(pipe.width, 49);
     });
 
     it('has a random y location', function() {
@@ -17,7 +17,7 @@ describe('Pipe', function(){
     });
 
     it('moves across the canvas', function(){
-      var pipe = new Pipe();
+      var pipe = new Pipe(context, 500);
 
       assert.equal(pipe.x, 500)
       for (var i = 0; i < 20; i++) {
