@@ -1,7 +1,7 @@
 {
-  "name": "game-time-starter-kit",
+  "name": "flappy-bird",
   "version": "1.0.0",
-  "description": "A starter kit for Turing School's Game Time project.",
+  "description": "A clone of the flappy-bird game",
   "main": "index.js",
   "scripts": {
     "start": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/turingschool-examples/game-time-starter-kit.git"
+    "url": "https://github.com/robbielane/flappy-bird.git"
   },
-  "author": "Steve Kinney",
+  "author": "Ross Edfort & Robbie Lane",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/turingschool-examples/game-time-starter-kit/issues"
+    "url": "https://github.com/robbielane/flappy-bird/issues"
   },
-  "homepage": "https://github.com/turingschool-examples/game-time-starter-kit",
+  "homepage": "https://github.com/robbielane/flappy-bird",
   "devDependencies": {
     "babel": "^5.8.3",
     "babel-core": "^5.7.4",
