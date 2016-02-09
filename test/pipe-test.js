@@ -19,11 +19,9 @@ describe('Pipe', function(){
     it('moves across the canvas', function(){
       var pipe = new Pipe(context, 500);
 
-      assert.equal(pipe.x, 500)
-      for (var i = 0; i < 20; i++) {
-        pipe.moveAcrossCanvas;
-      }
-      assert.equal(pipe.x, 480)
+      assert.equal(pipe.x, 500);
+      pipe.moveAcrossCanvas;
+      assert.equal(pipe.x, 498);
     });
   });
 });

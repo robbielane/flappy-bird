@@ -17,14 +17,15 @@ describe('Jorge', function() {
   context('move functionality', function(){
     it('should increment one', function () {
       var jorge = new Jorge(50,50,50,54);
-      jorge.moveUp;
+      jorge.move;
 
       assert.equal(49, jorge.y);
     });
 
     it('should decrement one', function () {
       var jorge = new Jorge(50,50,50,54);
-      jorge.moveDown;
+      jorge.momentum = 10;
+      jorge.move;
 
       assert.equal(51, jorge.y);
     });
