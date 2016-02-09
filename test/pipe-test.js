@@ -6,7 +6,7 @@ describe('Pipe', function(){
     it('has correct default attributes', function(){
       var pipe = new Pipe();
 
-      assert.equal(pipe.width, 100);
+      assert.equal(pipe.width, 75);
     });
 
     it('has a random height', function() {
