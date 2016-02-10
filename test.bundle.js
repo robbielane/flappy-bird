@@ -70,17 +70,17 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-	var Jorge = (function () {
-	  function Jorge(x, y) {
-	    _classCallCheck(this, Jorge);
+	var Bird = (function () {
+	  function Bird(x, y) {
+	    _classCallCheck(this, Bird);
 
 	    this.x = x;
 	    this.y = y;
 	    this.image = new Image();
-	    this.image.src = '../assets/images/jorge-bird-small.png';
+	    this.image.src = '../assets/images/bird-bird-small.png';
 	  }
 
-	  _createClass(Jorge, [{
+	  _createClass(Bird, [{
 	    key: 'moveUp',
 	    get: function get() {
 	      this.y--;
@@ -98,7 +98,7 @@
 	      }
 	    }
 	  }, {
-	    key: 'drawJorge',
+	    key: 'drawBird',
 	    get: function get() {
 	      var canvas = document.getElementById('game');
 	      var context = canvas.getContext('2d');
@@ -106,10 +106,10 @@
 	    }
 	  }]);
 
-	  return Jorge;
+	  return Bird;
 	})();
 
-	module.exports = Jorge;
+	module.exports = Bird;
 
 /***/ },
 /* 3 */
@@ -411,29 +411,29 @@
 
 	var Chai = __webpack_require__(13);
 	var assert = Chai.assert;
-	var Jorge = __webpack_require__(2);
+	var Bird = __webpack_require__(2);
 
-	describe('Jorge', function () {
+	describe('Bird', function () {
 
 	  it('should increment one', function () {
-	    var jorge = new Jorge(50, 50);
-	    jorge.moveUp;
+	    var bird = new Bird(50, 50);
+	    bird.moveUp;
 
-	    assert.equal(49, jorge.y);
+	    assert.equal(49, bird.y);
 	  });
 
 	  it('should decrement one', function () {
-	    var jorge = new Jorge(50, 50);
-	    jorge.moveDown;
+	    var bird = new Bird(50, 50);
+	    bird.moveDown;
 
-	    assert.equal(51, jorge.y);
+	    assert.equal(51, bird.y);
 	  });
 
 	  it('should increment y location by 50', function () {
-	    var jorge = new Jorge(50, 50);
-	    jorge.spacebarPress;
+	    var bird = new Bird(50, 50);
+	    bird.spacebarPress;
 
-	    assert.equal(0, jorge.y);
+	    assert.equal(0, bird.y);
 	  });
 	});
 
