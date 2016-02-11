@@ -4,28 +4,35 @@ var Collision = require('../lib/collision');
 var Bird = require('../lib/bird');
 var Pipe = require('../lib/pipe');
 var Ground = require('../lib/ground');
-var sinon = require('sinon/pkg/sinon');
 
 describe('Collision', function(){
   context('detection', function(){
-    it('when bird hits top pipe', function(){
+    it('when bird hits pipe', function(){
       var bird = new Bird(50, 50, 50, 57, context);
       var pipes = [new Pipe(context, 101)];
       var grounds = [new Ground(context, 0)];
       var collision = new Collision(bird, pipes, grounds);
+      collision.on('collisionEvent', () => { bird.alive = false; });
 
-      var birdPipeCollision = { collisionEvent: function detect(){} };
-      var spy = sinon.spy(birdPipeCollision, 'collisionEvent');
-
+      pipes[0].move;
+      pipes[0].updateBounds();
       collision.detect;
-      pipes.forEach( (pipe) => {
-        pipe.move;
-        pipe.updateBounds();
-      });
-      assert(spy.calledOnce, 'event was not fired');
+
+      assert.equal(bird.alive, false)
     });
 
-    xit('when bird hits bottom pipe', function(){
+    it('when bird hits ground', function(){
+      var bird = new Bird(50, 508, 50, 57, context);
+      var pipes = [new Pipe(context, 101)];
+      var grounds = [new Ground(context, 0)];
+      var collision = new Collision(bird, pipes, grounds);
+      collision.on('collisionEvent', () => { bird.alive = false; });
+
+      collision.detect;
+      bird.move;
+      bird.updateBounds();
+
+      assert.equal(bird.alive, false)
     });
   });
 });
