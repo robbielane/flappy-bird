@@ -4,11 +4,11 @@ var Collision = require('../lib/collision');
 var Bird = require('../lib/bird');
 var Pipe = require('../lib/pipe');
 var Ground = require('../lib/ground');
-const sinon = require('sinon/pkg/sinon');
+var sinon = require('sinon/pkg/sinon');
 
 describe('Collision', function(){
   context('detection', function(){
-    xit('when bird hits top pipe', function(){
+    it('when bird hits top pipe', function(){
       var bird = new Bird(50, 50, 50, 57, context);
       var pipes = [new Pipe(context, 101)];
       var grounds = [new Ground(context, 0)];
