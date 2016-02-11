@@ -57,12 +57,12 @@
 
 	'use strict';
 
-	var Jorge = __webpack_require__(2);
+	var Bird = __webpack_require__(2);
 
 	var canvas = document.getElementById('game');
 	debugger;
 	var context = canvas.getContext('2d');
-	var jorge = new Jorge(50, 50);
+	var bird = new Bird(50, 50);
 
 	var play = function play() {
 	  requestAnimationFrame(gameLoop);
@@ -70,8 +70,8 @@
 
 	var gameLoop = function gameLoop() {
 	  context.clearRect(0, 0, canvas.width, canvas.height);
-	  jorge.drawJorge;
-	  jorge.moveDown;
+	  bird.drawBird;
+	  bird.moveDown;
 	  requestAnimationFrame(gameLoop);
 	};
 
@@ -87,17 +87,17 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-	var Jorge = (function () {
-	  function Jorge(x, y) {
-	    _classCallCheck(this, Jorge);
+	var Bird = (function () {
+	  function Bird(x, y) {
+	    _classCallCheck(this, Bird);
 
 	    this.x = x;
 	    this.y = y;
 	    this.image = new Image();
-	    this.image.src = '../assets/images/jorge-bird-small.png';
+	    this.image.src = '../assets/images/bird-bird-small.png';
 	  }
 
-	  _createClass(Jorge, [{
+	  _createClass(Bird, [{
 	    key: 'moveUp',
 	    get: function get() {
 	      this.y--;
@@ -115,7 +115,7 @@
 	      }
 	    }
 	  }, {
-	    key: 'drawJorge',
+	    key: 'drawBird',
 	    get: function get() {
 	      var canvas = document.getElementById('game');
 	      var context = canvas.getContext('2d');
@@ -123,10 +123,10 @@
 	    }
 	  }]);
 
-	  return Jorge;
+	  return Bird;
 	})();
 
-	module.exports = Jorge;
+	module.exports = Bird;
 
 /***/ }
 /******/ ]);

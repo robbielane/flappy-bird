@@ -1,2 +1,3 @@
-require('./jorge-test')
+require('./bird-test')
 require('./pipe-test')
+require('./collision-test')
