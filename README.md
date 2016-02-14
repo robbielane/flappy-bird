@@ -1,4 +1,4 @@
-# Game Time Starter Kit
+# Flappy Bird
 
 To install the dependencies:
 
@@ -22,7 +22,6 @@ To build the static files:
 ```js
 npm run build
 ```
-
 
 To run tests in Node:
 
