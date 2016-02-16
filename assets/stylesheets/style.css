@@ -49,3 +49,20 @@ body {
   padding: 15px 30px;
   border-bottom: 1px solid #ccc;
 }
+
+.form input[type=text] {
+  font-size: 26px;
+  width: 70%;
+  border: 3px solid #d9534f;
+  border-radius: 5px;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+
+.form label {
+  color: #d9534f;
+}
+
+btn-danger {
+
+}
