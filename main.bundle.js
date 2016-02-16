@@ -10325,11 +10325,11 @@
 	    this.grounds = [new Ground(this.context, 0), new Ground(this.context, 504)];
 	    this.collision = new Collision(this.bird, this.pipes, this.grounds);
 	    this.background = new Image();
-	    this.background.src = '/assets/images/denver-background.png';
+	    this.background.src = '/flappy-bird/assets/images/denver-background.png';
 	    this.button = new Image();
-	    this.button.src = '/assets/images/button.png';
+	    this.button.src = '/flappy-bird/assets/images/button.png';
 	    this.logo = new Image();
-	    this.logo.src = '/assets/images/logo.png';
+	    this.logo.src = '/flappy-bird/assets/images/logo.png';
 	  }
 
 	  _createClass(Game, [{
@@ -10778,7 +10778,7 @@
 	    this.topRight = { x: this.x + this.width, y: this.y };
 	    this.bottomRight = { x: this.x + this.width, y: this.y + this.height };
 	    this.bottomLeft = { x: this.x, y: this.y + this.height };
-	    this.image.src = '/assets/images/flappy-bird.png';
+	    this.image.src = '/flappy-bird/assets/images/flappy-bird.png';
 	    this.gravity = 0;
 	  }
 
@@ -10795,14 +10795,14 @@
 	    get: function get() {
 	      this.gravity = this.gravity + 7;
 	      if (this.gravity > 250) {
-	        this.image.src = '/assets/images/flappy-bird-down.png';
+	        this.image.src = '/flappy-bird/assets/images/flappy-bird-down.png';
 	      }
 	      this.momentum ? this.jump : this.y = this.y + 4 * this.gravity / 150;
 	    }
 	  }, {
 	    key: 'die',
 	    get: function get() {
-	      this.image.src = '/assets/images/flappy-bird-die.png';
+	      this.image.src = '/flappy-bird/assets/images/flappy-bird-die.png';
 	      if (this.bottomRight.y < 520) {
 	        this.y = this.y + 10;
 	      }
@@ -10812,7 +10812,7 @@
 	    get: function get() {
 	      this.momentum--;
 	      this.gravity = 100;
-	      this.image.src = '/assets/images/flappy-bird-up.png';
+	      this.image.src = '/flappy-bird/assets/images/flappy-bird-up.png';
 	      this.y = this.y - 5;
 	    }
 	  }, {
@@ -10857,7 +10857,7 @@
 	    this.bottomRight = { x: this.x + this.width, y: -this.y + this.height + this.offset };
 	    this.bottomLeft = { x: this.x, y: -this.y + this.height + this.offset };
 	    this.image = new Image();
-	    this.image.src = '/assets/images/pipe.png';
+	    this.image.src = '/flappy-bird/assets/images/pipe.png';
 	  }
 
 	  _createClass(Pipe, [{
@@ -11001,7 +11001,7 @@
 	    this.x = x;
 	    this.y = 540;
 	    this.backgroundImage = new Image();
-	    this.backgroundImage.src = '/assets/images/background.png';
+	    this.backgroundImage.src = '/flappy-bird/assets/images/background.png';
 	  }
 
 	  _createClass(Ground, [{
