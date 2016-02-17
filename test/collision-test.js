@@ -18,7 +18,7 @@ describe('Collision', function(){
       pipes[0].updateBounds();
       collision.detect;
 
-      assert.equal(bird.alive, false)
+      assert.equal(bird.alive, false);
     });
 
     it('when bird hits ground', function(){
@@ -32,7 +32,7 @@ describe('Collision', function(){
       bird.move;
       bird.updateBounds();
 
-      assert.equal(bird.alive, false)
+      assert.equal(bird.alive, false);
     });
   });
 });
