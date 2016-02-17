@@ -32,7 +32,7 @@ describe('Pipe', function(){
         pipe.move;
         pipe.updateBounds();
       }
-      assert.equal(446, pipe.x)
+      assert.equal(446, pipe.x);
     });
   });
 

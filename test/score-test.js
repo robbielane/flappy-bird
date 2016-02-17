@@ -24,10 +24,10 @@ describe('Score', function(){
         pipe.move;
         pipe.updateBounds();
         if (pipe.x + 52 === bird.x) {
-          score.emit('incrementScoreEvent')
+          score.emit('incrementScoreEvent');
         }
       });
-      assert.equal(score.score, 1)
+      assert.equal(score.score, 1);
     });
   });
 });

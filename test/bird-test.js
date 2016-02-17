@@ -10,7 +10,7 @@ describe('Bird', function() {
       assert.equal(120, bird.x);
       assert.equal(50, bird.y);
       assert.equal(50, bird.width);
-      assert.equal(57, bird.height)
+      assert.equal(57, bird.height);
     });
   });
 
