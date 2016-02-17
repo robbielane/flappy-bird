@@ -79,6 +79,8 @@
 	module.exports = function (game) {
 	  scoreboard.populateScoreboard();
 	  events.startButtonClick(game);
+	  events.launchJorgeMode(game);
+	  events.launchBirdMode(game);
 	  events.addBirdMoveEvents(game);
 	  requestAnimationFrame(gameLoop.bind(null, game));
 	};
@@ -90,12 +92,36 @@
 	'use strict';
 
 	var scoreboard = __webpack_require__(3);
+	var collisionSound = new Audio();
+	var $ = __webpack_require__(4);
 
 	var startButtonClick = function startButtonClick(game) {
 	  game.canvas.addEventListener('click', function checkForButtonClick(e) {
 	    if (e.offsetY > 225 && e.offsetY < 290 && e.offsetX > 190 && e.offsetX < 300) {
 	      game.canvas.removeEventListener('click', checkForButtonClick);
 	      game.reset();
+	    }
+	  });
+	};
+
+	var launchJorgeMode = function launchJorgeMode(game) {
+	  window.addEventListener('keydown', function (e) {
+	    if (e.which === 74) {
+	      $('body').addClass('jorge');
+	      game.bird.jorgeMode();
+	      game.pipes[0].mode = 'jorge';
+	      game.pipes[1].mode = 'jorge';
+	    }
+	  });
+	};
+
+	var launchBirdMode = function launchBirdMode(game) {
+	  window.addEventListener('keydown', function (e) {
+	    if (e.which === 66) {
+	      $('body').removeClass('jorge');
+	      game.bird.birdMode();
+	      game.pipes[0].mode = 'bird';
+	      game.pipes[1].mode = 'bird';
 	    }
 	  });
 	};
@@ -111,6 +137,8 @@
 	    }
 	  });
 	  game.collision.on('collisionEvent', function () {
+	    collisionSound.src = '/flappy-bird/assets/sounds/' + game.bird.mode + '-hit.ogg';
+	    collisionSound.play();
 	    game.bird.alive = false;
 	    game.active = false;
 	    scoreboard.addScore(game.score.score);
@@ -119,7 +147,9 @@
 
 	module.exports = {
 	  startButtonClick: startButtonClick,
-	  addBirdMoveEvents: addBirdMoveEvents
+	  addBirdMoveEvents: addBirdMoveEvents,
+	  launchJorgeMode: launchJorgeMode,
+	  launchBirdMode: launchBirdMode
 	};
 
 /***/ },
@@ -145,7 +175,7 @@
 
 	var addScore = function addScore(score) {
 	  if (score > sortedScores[4].score) {
-	    $('.form').append("<input id=\"name\" type=\"text\"></input><input id=\"submit\" type=\"submit\"></input>");
+	    $('.form').append("<label>Congratulations! Please enter you name.</label><input id=\"name\" type=\"text\"></input><input id=\"submit\" class=\"btn btn-danger btn-lg\" type=\"submit\"></input>");
 	    $('#submit').on('click', function () {
 	      updateScoreboard(score);
 	    });
@@ -10319,9 +10349,9 @@
 	    this.active = false;
 	    this.canvas = canvas;
 	    this.context = this.canvas.getContext('2d');
-	    this.bird = new Bird(120, 240, 50, 32, this.context);
+	    this.bird = new Bird(120, 240, 50, 43, this.context);
 	    this.pipes = [new Pipe(this.context, 500), new Pipe(this.context, 800)];
-	    this.score = new Score($);
+	    this.score = new Score($, this.bird);
 	    this.grounds = [new Ground(this.context, 0), new Ground(this.context, 504)];
 	    this.collision = new Collision(this.bird, this.pipes, this.grounds);
 	    this.background = new Image();
@@ -10337,9 +10367,9 @@
 	    value: function start() {
 	      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	      this.context.drawImage(this.background, 0, 0);
+	      this.bird.draw;
 	      this.grounds[0].draw;
 	      this.grounds[1].draw;
-	      this.bird.draw;
 	      this.renderStartButton;
 	      this.renderLogo;
 	    }
@@ -10349,9 +10379,9 @@
 	      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	      this.context.drawImage(this.background, 0, 0);
 	      this.drawPipes();
+	      this.bird.draw;
 	      this.drawGrounds();
 	      this.bird.move;
-	      this.bird.draw;
 	      this.trackScore(this.pipes, this.bird);
 	      this.collision.detect;
 	      this.bird.updateBounds();
@@ -10362,18 +10392,11 @@
 	      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	      this.context.drawImage(this.background, 0, 0);
 	      this.drawPipes();
-	      this.drawGrounds();
-	      this.removeGameEvents();
 	      this.bird.draw;
+	      this.drawGrounds();
 	      this.bird.die;
 	      this.bird.updateBounds();
 	      this.start();
-	    }
-	  }, {
-	    key: 'removeGameEvents',
-	    value: function removeGameEvents() {
-	      this.canvas.removeEventListener('click', this.bird.spacebarPress);
-	      document.removeEventListener('keydown', this.bird.spacebarPress);
 	    }
 	  }, {
 	    key: 'drawGrounds',
@@ -10406,7 +10429,7 @@
 	      var _this3 = this;
 
 	      this.pipes.forEach(function (pipe) {
-	        if (pipe.x + 50 === _this3.bird.x) {
+	        if (pipe.x + 52 === _this3.bird.x) {
 	          _this3.score.emit('incrementScoreEvent');
 	        }
 	      });
@@ -10766,6 +10789,7 @@
 	    _classCallCheck(this, Bird);
 
 	    _get(Object.getPrototypeOf(Bird.prototype), 'constructor', this).call(this);
+	    this.mode = 'bird';
 	    this.alive = true;
 	    this.momentum = 0;
 	    this.x = x;
@@ -10778,11 +10802,28 @@
 	    this.topRight = { x: this.x + this.width, y: this.y };
 	    this.bottomRight = { x: this.x + this.width, y: this.y + this.height };
 	    this.bottomLeft = { x: this.x, y: this.y + this.height };
-	    this.image.src = '/flappy-bird/assets/images/flappy-bird.png';
+	    this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
 	    this.gravity = 0;
+	    this.frameCount = 0;
+	    this.frame = 0;
+	    this.flapSound = new Audio('/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg');
 	  }
 
 	  _createClass(Bird, [{
+	    key: 'jorgeMode',
+	    value: function jorgeMode() {
+	      this.mode = 'jorge';
+	      this.flapSound.src = '/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg';
+	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
+	    }
+	  }, {
+	    key: 'birdMode',
+	    value: function birdMode() {
+	      this.mode = 'bird';
+	      this.flapSound.src = '/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg';
+	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
+	    }
+	  }, {
 	    key: 'updateBounds',
 	    value: function updateBounds() {
 	      this.topLeft = { x: this.x, y: this.y };
@@ -10791,19 +10832,63 @@
 	      this.bottomLeft = { x: this.x, y: this.y + this.height };
 	    }
 	  }, {
+	    key: 'resetFrameCount',
+	    value: function resetFrameCount() {
+	      if (this.frameCount >= 60) {
+	        this.frameCount = 0;
+	      }
+	    }
+	  }, {
+	    key: 'animateBirdFrames',
+	    value: function animateBirdFrames() {
+	      this.frameCount++;
+	      if (this.firstThirdOfAnimation()) {
+	        this.drawFirstThirdOfAnimation();
+	      } else if (this.secondThirdOfAnimation()) {
+	        this.drawSecondThirdOfAnimation();
+	      } else {
+	        this.drawThirdThirdOfAnimation();
+	      }
+	    }
+	  }, {
+	    key: 'firstThirdOfAnimation',
+	    value: function firstThirdOfAnimation() {
+	      return this.frameCount > 0 && this.frameCount < 20;
+	    }
+	  }, {
+	    key: 'secondThirdOfAnimation',
+	    value: function secondThirdOfAnimation() {
+	      return this.frameCount > 20 && this.frameCount < 40;
+	    }
+	  }, {
+	    key: 'drawFirstThirdOfAnimation',
+	    value: function drawFirstThirdOfAnimation() {
+	      this.ctx.drawImage(this.image, 0, 0, 57, 60, this.x, this.y, 57, 60);
+	    }
+	  }, {
+	    key: 'drawSecondThirdOfAnimation',
+	    value: function drawSecondThirdOfAnimation() {
+	      this.ctx.drawImage(this.image, 57, 0, 57, 60, this.x, this.y, 57, 60);
+	    }
+	  }, {
+	    key: 'drawThirdThirdOfAnimation',
+	    value: function drawThirdThirdOfAnimation() {
+	      this.ctx.drawImage(this.image, 114, 0, 57, 60, this.x, this.y, 57, 60);
+	    }
+	  }, {
 	    key: 'move',
 	    get: function get() {
 	      this.gravity = this.gravity + 7;
 	      if (this.gravity > 250) {
-	        this.image.src = '/flappy-bird/assets/images/flappy-bird-down.png';
+	        this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-down-sprite.png';
 	      }
 	      this.momentum ? this.jump : this.y = this.y + 4 * this.gravity / 150;
 	    }
 	  }, {
 	    key: 'die',
 	    get: function get() {
-	      this.image.src = '/flappy-bird/assets/images/flappy-bird-die.png';
-	      if (this.bottomRight.y < 520) {
+	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-die.png';
+	      if (this.bottomRight.y < 525) {
 	        this.y = this.y + 10;
 	      }
 	    }
@@ -10812,18 +10897,24 @@
 	    get: function get() {
 	      this.momentum--;
 	      this.gravity = 100;
-	      this.image.src = '/flappy-bird/assets/images/flappy-bird-up.png';
-	      this.y = this.y - 5;
+	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
+	      this.y = this.y - 7 * this.momentum / 10;
 	    }
 	  }, {
 	    key: 'spacebarPress',
 	    get: function get() {
+	      this.flapSound.play();
 	      this.momentum = 15;
 	    }
 	  }, {
 	    key: 'draw',
 	    get: function get() {
-	      this.ctx.drawImage(this.image, this.x, this.y);
+	      if (!this.alive) {
+	        this.ctx.drawImage(this.image, this.x, this.y);
+	      } else {
+	        this.animateBirdFrames();
+	      }
+	      this.resetFrameCount();
 	    }
 	  }]);
 
@@ -10846,18 +10937,19 @@
 	  function Pipe(ctx, x) {
 	    _classCallCheck(this, Pipe);
 
+	    this.mode = 'bird';
 	    this.ctx = ctx;
 	    this.x = x;
 	    this.y = Math.floor(Math.random() * (600 - 300)) + 300;
 	    this.width = 102;
 	    this.height = 640;
-	    this.offset = 140;
+	    this.offset = 150;
 	    this.topLeft = { x: this.x, y: -this.y + this.height };
 	    this.topRight = { x: this.x + this.width, y: -this.y + this.height };
 	    this.bottomRight = { x: this.x + this.width, y: -this.y + this.height + this.offset };
 	    this.bottomLeft = { x: this.x, y: -this.y + this.height + this.offset };
 	    this.image = new Image();
-	    this.image.src = '/flappy-bird/assets/images/pipe.png';
+	    this.image.src = '/flappy-bird/assets/images/' + this.mode + '-pipe.png';
 	  }
 
 	  _createClass(Pipe, [{
@@ -10871,6 +10963,7 @@
 	  }, {
 	    key: 'draw',
 	    get: function get() {
+	      this.image.src = '/flappy-bird/assets/images/' + this.mode + '-pipe.png';
 	      this.ctx.drawImage(this.image, this.x, -this.y);
 	      this.ctx.drawImage(this.image, this.x, -this.y + this.height + this.offset);
 	    }
@@ -10879,10 +10972,10 @@
 	    get: function get() {
 	      if (this.topRight.x < 0) {
 	        this.x = 500;
-	        this.x = this.x - 2;
+	        this.x = this.x - 3;
 	        this.y = Math.floor(Math.random() * (600 - 300)) + 300;
 	      } else {
-	        this.x = this.x - 2;
+	        this.x = this.x - 3;
 	      }
 	    }
 	  }]);
@@ -10918,6 +11011,7 @@
 	    this.bird = bird;
 	    this.pipes = pipes;
 	    this.grounds = grounds;
+	    this.dieSound = new Audio('/flappy-bird/assets/sounds/' + this.bird.mode + '-die.ogg');
 	  }
 
 	  _createClass(Collision, [{
@@ -10927,6 +11021,7 @@
 
 	      this.pipes.forEach(function (pipe) {
 	        if (_this.inBetweenPipes(pipe) && _this.hitTopPipe(pipe)) {
+	          _this.dieSound.play();
 	          _this.emit('collisionEvent');
 	        }
 	      });
@@ -10938,6 +11033,7 @@
 
 	      this.pipes.forEach(function (pipe) {
 	        if (_this2.inBetweenPipes(pipe) && _this2.hitBottomPipe(pipe)) {
+	          _this2.dieSound.play();
 	          _this2.emit('collisionEvent');
 	        }
 	      });
@@ -11015,9 +11111,9 @@
 	    get: function get() {
 	      if (this.x < -500) {
 	        this.x = 504;
-	        this.x = this.x - 1.9;
+	        this.x = this.x - 3;
 	      } else {
-	        this.x = this.x - 1.9;
+	        this.x = this.x - 3;
 	      }
 	    }
 	  }]);
@@ -11046,18 +11142,22 @@
 	var Score = (function (_EventEmitter) {
 	  _inherits(Score, _EventEmitter);
 
-	  function Score($) {
+	  function Score($, bird) {
 	    _classCallCheck(this, Score);
 
 	    _get(Object.getPrototypeOf(Score.prototype), 'constructor', this).call(this);
+	    this.bird = bird;
 	    this.$ = $;
 	    this.score = 0;
+	    this.sound = new Audio();
 	  }
 
 	  _createClass(Score, [{
 	    key: 'increment',
 	    get: function get() {
 	      this.on('incrementScoreEvent', function () {
+	        this.sound.src = 'flappy-bird/assets/sounds/' + this.bird.mode + '-point.ogg';
+	        this.sound.play();
 	        this.score++;
 	        this.appendScore;
 	      });

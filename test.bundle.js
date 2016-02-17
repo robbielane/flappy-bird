@@ -10228,6 +10228,7 @@
 	    _classCallCheck(this, Bird);
 
 	    _get(Object.getPrototypeOf(Bird.prototype), 'constructor', this).call(this);
+	    this.mode = 'bird';
 	    this.alive = true;
 	    this.momentum = 0;
 	    this.x = x;
@@ -10240,11 +10241,28 @@
 	    this.topRight = { x: this.x + this.width, y: this.y };
 	    this.bottomRight = { x: this.x + this.width, y: this.y + this.height };
 	    this.bottomLeft = { x: this.x, y: this.y + this.height };
-	    this.image.src = '/flappy-bird/assets/images/flappy-bird.png';
+	    this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
 	    this.gravity = 0;
+	    this.frameCount = 0;
+	    this.frame = 0;
+	    this.flapSound = new Audio('/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg');
 	  }
 
 	  _createClass(Bird, [{
+	    key: 'jorgeMode',
+	    value: function jorgeMode() {
+	      this.mode = 'jorge';
+	      this.flapSound.src = '/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg';
+	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
+	    }
+	  }, {
+	    key: 'birdMode',
+	    value: function birdMode() {
+	      this.mode = 'bird';
+	      this.flapSound.src = '/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg';
+	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
+	    }
+	  }, {
 	    key: 'updateBounds',
 	    value: function updateBounds() {
 	      this.topLeft = { x: this.x, y: this.y };
@@ -10253,19 +10271,63 @@
 	      this.bottomLeft = { x: this.x, y: this.y + this.height };
 	    }
 	  }, {
+	    key: 'resetFrameCount',
+	    value: function resetFrameCount() {
+	      if (this.frameCount >= 60) {
+	        this.frameCount = 0;
+	      }
+	    }
+	  }, {
+	    key: 'animateBirdFrames',
+	    value: function animateBirdFrames() {
+	      this.frameCount++;
+	      if (this.firstThirdOfAnimation()) {
+	        this.drawFirstThirdOfAnimation();
+	      } else if (this.secondThirdOfAnimation()) {
+	        this.drawSecondThirdOfAnimation();
+	      } else {
+	        this.drawThirdThirdOfAnimation();
+	      }
+	    }
+	  }, {
+	    key: 'firstThirdOfAnimation',
+	    value: function firstThirdOfAnimation() {
+	      return this.frameCount > 0 && this.frameCount < 20;
+	    }
+	  }, {
+	    key: 'secondThirdOfAnimation',
+	    value: function secondThirdOfAnimation() {
+	      return this.frameCount > 20 && this.frameCount < 40;
+	    }
+	  }, {
+	    key: 'drawFirstThirdOfAnimation',
+	    value: function drawFirstThirdOfAnimation() {
+	      this.ctx.drawImage(this.image, 0, 0, 57, 60, this.x, this.y, 57, 60);
+	    }
+	  }, {
+	    key: 'drawSecondThirdOfAnimation',
+	    value: function drawSecondThirdOfAnimation() {
+	      this.ctx.drawImage(this.image, 57, 0, 57, 60, this.x, this.y, 57, 60);
+	    }
+	  }, {
+	    key: 'drawThirdThirdOfAnimation',
+	    value: function drawThirdThirdOfAnimation() {
+	      this.ctx.drawImage(this.image, 114, 0, 57, 60, this.x, this.y, 57, 60);
+	    }
+	  }, {
 	    key: 'move',
 	    get: function get() {
 	      this.gravity = this.gravity + 7;
 	      if (this.gravity > 250) {
-	        this.image.src = '/flappy-bird/assets/images/flappy-bird-down.png';
+	        this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-down-sprite.png';
 	      }
 	      this.momentum ? this.jump : this.y = this.y + 4 * this.gravity / 150;
 	    }
 	  }, {
 	    key: 'die',
 	    get: function get() {
-	      this.image.src = '/flappy-bird/assets/images/flappy-bird-die.png';
-	      if (this.bottomRight.y < 520) {
+	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-die.png';
+	      if (this.bottomRight.y < 525) {
 	        this.y = this.y + 10;
 	      }
 	    }
@@ -10274,18 +10336,24 @@
 	    get: function get() {
 	      this.momentum--;
 	      this.gravity = 100;
-	      this.image.src = '/flappy-bird/assets/images/flappy-bird-up.png';
-	      this.y = this.y - 5;
+	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
+	      this.y = this.y - 7 * this.momentum / 10;
 	    }
 	  }, {
 	    key: 'spacebarPress',
 	    get: function get() {
+	      this.flapSound.play();
 	      this.momentum = 15;
 	    }
 	  }, {
 	    key: 'draw',
 	    get: function get() {
-	      this.ctx.drawImage(this.image, this.x, this.y);
+	      if (!this.alive) {
+	        this.ctx.drawImage(this.image, this.x, this.y);
+	      } else {
+	        this.animateBirdFrames();
+	      }
+	      this.resetFrameCount();
 	    }
 	  }]);
 
@@ -10308,18 +10376,19 @@
 	  function Pipe(ctx, x) {
 	    _classCallCheck(this, Pipe);
 
+	    this.mode = 'bird';
 	    this.ctx = ctx;
 	    this.x = x;
 	    this.y = Math.floor(Math.random() * (600 - 300)) + 300;
 	    this.width = 102;
 	    this.height = 640;
-	    this.offset = 140;
+	    this.offset = 150;
 	    this.topLeft = { x: this.x, y: -this.y + this.height };
 	    this.topRight = { x: this.x + this.width, y: -this.y + this.height };
 	    this.bottomRight = { x: this.x + this.width, y: -this.y + this.height + this.offset };
 	    this.bottomLeft = { x: this.x, y: -this.y + this.height + this.offset };
 	    this.image = new Image();
-	    this.image.src = '/flappy-bird/assets/images/pipe.png';
+	    this.image.src = '/flappy-bird/assets/images/' + this.mode + '-pipe.png';
 	  }
 
 	  _createClass(Pipe, [{
@@ -10333,6 +10402,7 @@
 	  }, {
 	    key: 'draw',
 	    get: function get() {
+	      this.image.src = '/flappy-bird/assets/images/' + this.mode + '-pipe.png';
 	      this.ctx.drawImage(this.image, this.x, -this.y);
 	      this.ctx.drawImage(this.image, this.x, -this.y + this.height + this.offset);
 	    }
@@ -10341,10 +10411,10 @@
 	    get: function get() {
 	      if (this.topRight.x < 0) {
 	        this.x = 500;
-	        this.x = this.x - 2;
+	        this.x = this.x - 3;
 	        this.y = Math.floor(Math.random() * (600 - 300)) + 300;
 	      } else {
-	        this.x = this.x - 2;
+	        this.x = this.x - 3;
 	      }
 	    }
 	  }]);
@@ -10380,6 +10450,7 @@
 	    this.bird = bird;
 	    this.pipes = pipes;
 	    this.grounds = grounds;
+	    this.dieSound = new Audio('/flappy-bird/assets/sounds/' + this.bird.mode + '-die.ogg');
 	  }
 
 	  _createClass(Collision, [{
@@ -10389,6 +10460,7 @@
 
 	      this.pipes.forEach(function (pipe) {
 	        if (_this.inBetweenPipes(pipe) && _this.hitTopPipe(pipe)) {
+	          _this.dieSound.play();
 	          _this.emit('collisionEvent');
 	        }
 	      });
@@ -10400,6 +10472,7 @@
 
 	      this.pipes.forEach(function (pipe) {
 	        if (_this2.inBetweenPipes(pipe) && _this2.hitBottomPipe(pipe)) {
+	          _this2.dieSound.play();
 	          _this2.emit('collisionEvent');
 	        }
 	      });
@@ -10477,9 +10550,9 @@
 	    get: function get() {
 	      if (this.x < -500) {
 	        this.x = 504;
-	        this.x = this.x - 1.9;
+	        this.x = this.x - 3;
 	      } else {
-	        this.x = this.x - 1.9;
+	        this.x = this.x - 3;
 	      }
 	    }
 	  }]);
@@ -10508,18 +10581,22 @@
 	var Score = (function (_EventEmitter) {
 	  _inherits(Score, _EventEmitter);
 
-	  function Score($) {
+	  function Score($, bird) {
 	    _classCallCheck(this, Score);
 
 	    _get(Object.getPrototypeOf(Score.prototype), 'constructor', this).call(this);
+	    this.bird = bird;
 	    this.$ = $;
 	    this.score = 0;
+	    this.sound = new Audio();
 	  }
 
 	  _createClass(Score, [{
 	    key: 'increment',
 	    get: function get() {
 	      this.on('incrementScoreEvent', function () {
+	        this.sound.src = 'flappy-bird/assets/sounds/' + this.bird.mode + '-point.ogg';
+	        this.sound.play();
 	        this.score++;
 	        this.appendScore;
 	      });
