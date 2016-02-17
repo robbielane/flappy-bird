@@ -4,7 +4,7 @@
   float: left;
 }
 
-body {
+.jorge {
   background-image: url('/assets/images/jorge-bird-small.png');
 }
 
@@ -28,7 +28,6 @@ body {
 #scoreboard-table {
   width: 50%;
   font-size: 24px;
-  /*font-family: sans-serif;*/
 }
 
 #scoreboard-table thead {
