@@ -10595,7 +10595,7 @@
 	    key: 'increment',
 	    get: function get() {
 	      this.on('incrementScoreEvent', function () {
-	        this.sound.src = 'flappy-bird/assets/sounds/' + this.bird.mode + '-point.ogg';
+	        this.sound.src = '/flappy-bird/assets/sounds/' + this.bird.mode + '-point.ogg';
 	        this.sound.play();
 	        this.score++;
 	        this.appendScore;
