@@ -15,19 +15,19 @@ describe('Bird', function() {
   });
 
   context('move functionality', function(){
-    it('should increment 4', function () {
+    it('should increment', function () {
       var bird = new Bird(50,50,50,57);
       bird.move;
 
-      assert.equal(54, bird.y);
+      assert.isAbove(bird.y, 50);
     });
 
-    it('should decrement 4', function () {
+    it('should decrement', function () {
       var bird = new Bird(50,50,50,57);
       bird.momentum = 10;
       bird.move;
 
-      assert.equal(46, bird.y);
+      assert.isBelow(bird.y, 50);
     });
 
     it('should set momentum to 15', function() {
@@ -58,10 +58,10 @@ describe('Bird', function() {
       bird.move;
       bird.updateBounds();
 
-      assert.equal(46, bird.topLeft.y);
-      assert.equal(46, bird.topRight.y);
-      assert.equal(103, bird.bottomRight.y);
-      assert.equal(103, bird.bottomLeft.y);
+      assert.isBelow(bird.topLeft.y, 50);
+      assert.isBelow(bird.topRight.y, 50);
+      assert.isBelow(bird.bottomRight.y, 107);
+      assert.isBelow(bird.bottomLeft.y, 107);
     });
 
     it('should increment Y coords on move down', function(){
@@ -69,10 +69,10 @@ describe('Bird', function() {
       bird.move;
       bird.updateBounds();
 
-      assert.equal(54, bird.topLeft.y);
-      assert.equal(54, bird.topRight.y);
-      assert.equal(111, bird.bottomRight.y);
-      assert.equal(111, bird.bottomLeft.y);
+      assert.isAbove(bird.topLeft.y, 50);
+      assert.isAbove(bird.topRight.y, 50);
+      assert.isAbove(bird.bottomRight.y, 107);
+      assert.isAbove(bird.bottomLeft.y, 107);
     });
 
     it('should not affect X coords on move', function(){

@@ -23,7 +23,7 @@ describe('Pipe', function(){
 
       assert.equal(500, pipe.x);
       pipe.move;
-      assert.equal(498, pipe.x);
+      assert.equal(497, pipe.x);
     });
 
     it('resets', function(){
@@ -32,7 +32,7 @@ describe('Pipe', function(){
         pipe.move;
         pipe.updateBounds();
       }
-      assert.equal(498, pipe.x)
+      assert.equal(446, pipe.x)
     });
   });
 
@@ -51,10 +51,10 @@ describe('Pipe', function(){
       pipe.move;
       pipe.updateBounds();
 
-      assert.equal(498, pipe.topLeft.x);
-      assert.equal(600, pipe.topRight.x);
-      assert.equal(600, pipe.bottomRight.x);
-      assert.equal(498, pipe.bottomLeft.x);
+      assert.equal(497, pipe.topLeft.x);
+      assert.equal(599, pipe.topRight.x);
+      assert.equal(599, pipe.bottomRight.x);
+      assert.equal(497, pipe.bottomLeft.x);
     });
   });
 });
