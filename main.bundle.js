@@ -47,9 +47,11 @@
 	'use strict';
 
 	var canvas = document.getElementById('game');
+	var konami = __webpack_require__(1);
+	var looper = __webpack_require__(3);
+	var Game = __webpack_require__(7);
 
-	var looper = __webpack_require__(1);
-	var Game = __webpack_require__(6);
+	konami();
 
 	var game = new Game(canvas);
 	looper(game);
@@ -58,155 +60,42 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
-	var events = __webpack_require__(2);
-	var scoreboard = __webpack_require__(3);
+	var $ = __webpack_require__(2);
 
-	var gameLoop = function gameLoop(game) {
-	  if (game.active) {
-	    game.play();
-	  } else if (!game.bird.alive) {
-	    events.startButtonClick(game);
-	    game.end();
-	  } else {
-	    game.start();
+	var secret = "38384040373937396665";
+	var input = "";
+	var timer = undefined;
+
+	var start = function start() {
+	  $(document).keyup(function (e) {
+	    input += e.which;
+	    clearTimeout(timer);
+	    timer = setTimeout(function () {
+	      input = "";
+	    }, 500);
+	    check_input();
+	  });
+	};
+
+	var check_input = function check_input() {
+	  if (input === secret) {
+	    animateJorge();
 	  }
-	  requestAnimationFrame(gameLoop.bind(null, game));
 	};
 
-	module.exports = function (game) {
-	  scoreboard.populateScoreboard();
-	  events.startButtonClick(game);
-	  events.launchJorgeMode(game);
-	  events.launchBirdMode(game);
-	  events.addBirdMoveEvents(game);
-	  requestAnimationFrame(gameLoop.bind(null, game));
+	var animateJorge = function animateJorge() {
+	  $('body').prepend("<img src='/flappy-bird/assets/images/jorge-bird.png' class='konami'>");
+	  setTimeout(function () {
+	    $('.konami').remove();
+	  }, 3000);
 	};
+
+	module.exports = start;
 
 /***/ },
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var scoreboard = __webpack_require__(3);
-	var collisionSound = new Audio();
-	var $ = __webpack_require__(4);
-
-	var startButtonClick = function startButtonClick(game) {
-	  game.canvas.addEventListener('click', function checkForButtonClick(e) {
-	    if (e.offsetY > 225 && e.offsetY < 290 && e.offsetX > 190 && e.offsetX < 300) {
-	      game.canvas.removeEventListener('click', checkForButtonClick);
-	      game.reset();
-	    }
-	  });
-	};
-
-	var launchJorgeMode = function launchJorgeMode(game) {
-	  window.addEventListener('keydown', function (e) {
-	    if (e.which === 74) {
-	      e.preventDefault();
-	      $('body').addClass('jorge');
-	      game.bird.jorgeMode();
-	      game.pipes[0].mode = 'jorge';
-	      game.pipes[1].mode = 'jorge';
-	    }
-	  });
-	};
-
-	var launchBirdMode = function launchBirdMode(game) {
-	  window.addEventListener('keydown', function (e) {
-	    if (e.which === 66) {
-	      e.preventDefault();
-	      $('body').removeClass('jorge');
-	      game.bird.birdMode();
-	      game.pipes[0].mode = 'bird';
-	      game.pipes[1].mode = 'bird';
-	    }
-	  });
-	};
-
-	var addBirdMoveEvents = function addBirdMoveEvents(game) {
-	  game.score.increment;
-	  game.canvas.addEventListener('click', function () {
-	    game.bird.spacebarPress;
-	  });
-	  document.addEventListener('keydown', function (e) {
-	    if (e.which === 32) {
-	      e.preventDefault();
-	      game.bird.spacebarPress;
-	    }
-	  });
-
-	  game.collision.on('collisionEvent', function () {
-	    collisionSound.src = '/flappy-bird/assets/sounds/' + game.bird.mode + '-hit.ogg';
-	    collisionSound.play();
-	    game.bird.alive = false;
-	    game.active = false;
-	    scoreboard.addScore(game.score.score);
-	  });
-	};
-
-	module.exports = {
-	  startButtonClick: startButtonClick,
-	  addBirdMoveEvents: addBirdMoveEvents,
-	  launchJorgeMode: launchJorgeMode,
-	  launchBirdMode: launchBirdMode
-	};
-
-/***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var $ = __webpack_require__(4);
-	var Firebase = __webpack_require__(5);
-	var fireDb = new Firebase("https://flappy-jorge.firebaseio.com/");
-	var sortedScores = [];
-
-	var sortScores = function sortScores(scores) {
-	  var sorted = scores.sort(function (a, b) {
-	    return b.score - a.score;
-	  });
-	  return sorted;
-	};
-
-	var populateScoreboard = function populateScoreboard() {
-	  fireDb.child('scoreboard').on('value', function (scores) {
-	    $('#scoreboard').empty();
-	    sortedScores = sortScores(scores.val());
-	    sortedScores.forEach(function (record, index) {
-	      appendScore(record, index + 1);
-	    });
-	  });
-	};
-
-	var addScore = function addScore(score) {
-	  if (score > sortedScores[4].score) {
-	    $('.form').append("<label>Congratulations! Please enter you name.</label><input id=\"name\" type=\"text\"></input><input id=\"submit\" class=\"btn btn-danger btn-lg\" type=\"submit\"></input>");
-	    $('#submit').on('click', function () {
-	      updateScoreboard(score);
-	    });
-	  }
-	};
-
-	var updateScoreboard = function updateScoreboard(score) {
-	  sortedScores.push({ name: $('#name').val(), score: score });
-	  sortScores(sortedScores);
-	  fireDb.set({ scoreboard: sortedScores.slice(0, 5) });
-	  $('.form').children().remove();
-	};
-
-	var appendScore = function appendScore(record, index) {
-	  $('#scoreboard').append("<tr>\n      <td>" + index + ".</td>\n      <td>" + record.name + "</td>\n      <td>" + record.score + "</td>\n    </td>");
-	};
-
-	module.exports = { addScore: addScore, populateScoreboard: populateScoreboard };
-
-/***/ },
-/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -10043,7 +9932,158 @@
 
 
 /***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var events = __webpack_require__(4);
+	var scoreboard = __webpack_require__(5);
+
+	var gameLoop = function gameLoop(game) {
+	  if (game.active) {
+	    game.play();
+	  } else if (!game.bird.alive) {
+	    events.startButtonClick(game);
+	    game.end();
+	  } else {
+	    game.start();
+	  }
+	  requestAnimationFrame(gameLoop.bind(null, game));
+	};
+
+	module.exports = function (game) {
+	  scoreboard.populateScoreboard();
+	  events.startButtonClick(game);
+	  events.launchJorgeMode(game);
+	  events.launchBirdMode(game);
+	  events.addBirdMoveEvents(game);
+	  requestAnimationFrame(gameLoop.bind(null, game));
+	};
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var scoreboard = __webpack_require__(5);
+	var collisionSound = new Audio();
+	var $ = __webpack_require__(2);
+
+	var startButtonClick = function startButtonClick(game) {
+	  game.canvas.addEventListener('click', function checkForButtonClick(e) {
+	    if (e.offsetY > 225 && e.offsetY < 290 && e.offsetX > 190 && e.offsetX < 300) {
+	      game.canvas.removeEventListener('click', checkForButtonClick);
+	      game.reset();
+	    }
+	  });
+	};
+
+	var launchJorgeMode = function launchJorgeMode(game) {
+	  window.addEventListener('keydown', function (e) {
+	    if (e.which === 74) {
+	      e.preventDefault();
+	      $('body').addClass('jorge');
+	      game.bird.jorgeMode();
+	      game.pipes[0].mode = 'jorge';
+	      game.pipes[1].mode = 'jorge';
+	    }
+	  });
+	};
+
+	var launchBirdMode = function launchBirdMode(game) {
+	  window.addEventListener('keydown', function (e) {
+	    if (e.which === 66) {
+	      // e.preventDefault();
+	      $('body').removeClass('jorge');
+	      game.bird.birdMode();
+	      game.pipes[0].mode = 'bird';
+	      game.pipes[1].mode = 'bird';
+	    }
+	  });
+	};
+
+	var addBirdMoveEvents = function addBirdMoveEvents(game) {
+	  game.score.increment;
+	  game.canvas.addEventListener('click', function () {
+	    game.bird.spacebarPress;
+	  });
+	  document.addEventListener('keydown', function (e) {
+	    if (e.which === 32) {
+	      e.preventDefault();
+	      game.bird.spacebarPress;
+	    }
+	  });
+
+	  game.collision.on('collisionEvent', function () {
+	    collisionSound.src = '/flappy-bird/assets/sounds/' + game.bird.mode + '-hit.ogg';
+	    collisionSound.play();
+	    game.bird.alive = false;
+	    game.active = false;
+	    scoreboard.addScore(game.score.score);
+	  });
+	};
+
+	module.exports = {
+	  startButtonClick: startButtonClick,
+	  addBirdMoveEvents: addBirdMoveEvents,
+	  launchJorgeMode: launchJorgeMode,
+	  launchBirdMode: launchBirdMode
+	};
+
+/***/ },
 /* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var $ = __webpack_require__(2);
+	var Firebase = __webpack_require__(6);
+	var fireDb = new Firebase("https://flappy-jorge.firebaseio.com/");
+	var sortedScores = [];
+
+	var sortScores = function sortScores(scores) {
+	  var sorted = scores.sort(function (a, b) {
+	    return b.score - a.score;
+	  });
+	  return sorted;
+	};
+
+	var populateScoreboard = function populateScoreboard() {
+	  fireDb.child('scoreboard').on('value', function (scores) {
+	    $('#scoreboard').empty();
+	    sortedScores = sortScores(scores.val());
+	    sortedScores.forEach(function (record, index) {
+	      appendScore(record, index + 1);
+	    });
+	  });
+	};
+
+	var addScore = function addScore(score) {
+	  if (score > sortedScores[4].score) {
+	    $('.form').append("<label>Congratulations! Please enter you name.</label><input id=\"name\" type=\"text\"></input><input id=\"submit\" class=\"btn btn-danger btn-lg\" type=\"submit\"></input>");
+	    $('#submit').on('click', function () {
+	      updateScoreboard(score);
+	    });
+	  }
+	};
+
+	var updateScoreboard = function updateScoreboard(score) {
+	  sortedScores.push({ name: $('#name').val(), score: score });
+	  sortScores(sortedScores);
+	  fireDb.set({ scoreboard: sortedScores.slice(0, 5) });
+	  $('.form').children().remove();
+	};
+
+	var appendScore = function appendScore(record, index) {
+	  $('#scoreboard').append("<tr>\n      <td>" + index + ".</td>\n      <td>" + record.name + "</td>\n      <td>" + record.score + "</td>\n    </td>");
+	};
+
+	module.exports = { addScore: addScore, populateScoreboard: populateScoreboard };
+
+/***/ },
+/* 6 */
 /***/ function(module, exports) {
 
 	/*! @license Firebase v2.4.0
@@ -10327,7 +10367,7 @@
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -10336,12 +10376,12 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-	var $ = __webpack_require__(4);
-	var Bird = __webpack_require__(7);
-	var Pipe = __webpack_require__(9);
-	var Collision = __webpack_require__(10);
-	var Ground = __webpack_require__(11);
-	var Score = __webpack_require__(12);
+	var $ = __webpack_require__(2);
+	var Bird = __webpack_require__(8);
+	var Pipe = __webpack_require__(10);
+	var Collision = __webpack_require__(11);
+	var Ground = __webpack_require__(12);
+	var Score = __webpack_require__(13);
 
 	var Game = (function () {
 	  function Game(canvas) {
@@ -10464,7 +10504,7 @@
 	module.exports = Game;
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -10477,7 +10517,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var EventEmitter = __webpack_require__(8);
+	var EventEmitter = __webpack_require__(9);
 
 	var Bird = (function (_EventEmitter) {
 	  _inherits(Bird, _EventEmitter);
@@ -10621,7 +10661,7 @@
 	module.exports = Bird;
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -10925,7 +10965,7 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -10987,7 +11027,7 @@
 	module.exports = Pipe;
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -11000,7 +11040,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var EventEmitter = __webpack_require__(8);
+	var EventEmitter = __webpack_require__(9);
 
 	var Collision = (function (_EventEmitter) {
 	  _inherits(Collision, _EventEmitter);
@@ -11081,7 +11121,7 @@
 	module.exports = Collision;
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -11125,7 +11165,7 @@
 	module.exports = Ground;
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -11138,7 +11178,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var EventEmitter = __webpack_require__(8);
+	var EventEmitter = __webpack_require__(9);
 
 	var Score = (function (_EventEmitter) {
 	  _inherits(Score, _EventEmitter);

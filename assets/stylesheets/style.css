@@ -62,6 +62,14 @@
   color: #d9534f;
 }
 
-btn-danger {
+.konami {
+  position: absolute;
+  bottom: -120px;
+  left: 2000px;
+  animation: jorge 3s ease;
+}
 
+@keyframes jorge {
+  from { left: 25px}
+  to { left: 2000px}
 }
