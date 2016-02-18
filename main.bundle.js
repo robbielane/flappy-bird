@@ -9983,7 +9983,6 @@
 	var launchJorgeMode = function launchJorgeMode(game) {
 	  window.addEventListener('keydown', function (e) {
 	    if (e.which === 74) {
-	      e.preventDefault();
 	      $('body').addClass('jorge');
 	      game.bird.jorgeMode();
 	      game.pipes[0].mode = 'jorge';
@@ -9995,7 +9994,6 @@
 	var launchBirdMode = function launchBirdMode(game) {
 	  window.addEventListener('keydown', function (e) {
 	    if (e.which === 66) {
-	      // e.preventDefault();
 	      $('body').removeClass('jorge');
 	      game.bird.birdMode();
 	      game.pipes[0].mode = 'bird';
