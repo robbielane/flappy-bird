@@ -16,18 +16,18 @@ describe('Score', function(){
 
   context('tracking', function(){
     it('increments when bird moves through pipe', function(){
-      var score = new Score($);
       var bird = new Bird(240, 270, 50, 57, context);
-      var pipes = [new Pipe(context, 192)];
+      var score = new Score($, bird);
+      var pipes = [new Pipe(context, 191)];
       score.increment;
       pipes.forEach(function(pipe){
         pipe.move;
         pipe.updateBounds();
-        if (pipe.x + 50 === bird.x) {
-          score.emit('incrementScoreEvent')
+        if (pipe.x + 52 === bird.x) {
+          score.emit('incrementScoreEvent');
         }
       });
-      assert(score.score, 1)
+      assert.equal(score.score, 1);
     });
   });
 });

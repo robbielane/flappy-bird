@@ -48,11 +48,11 @@
 
 	var canvas = document.getElementById('game');
 
-	var Looper = __webpack_require__(1);
+	var looper = __webpack_require__(1);
 	var Game = __webpack_require__(6);
 
 	var game = new Game(canvas);
-	Looper(game);
+	looper(game);
 
 /***/ },
 /* 1 */
@@ -60,7 +60,6 @@
 
 	'use strict';
 
-	var canvas = document.querySelector('#game');
 	var events = __webpack_require__(2);
 	var scoreboard = __webpack_require__(3);
 
@@ -107,6 +106,7 @@
 	var launchJorgeMode = function launchJorgeMode(game) {
 	  window.addEventListener('keydown', function (e) {
 	    if (e.which === 74) {
+	      e.preventDefault();
 	      $('body').addClass('jorge');
 	      game.bird.jorgeMode();
 	      game.pipes[0].mode = 'jorge';
@@ -118,6 +118,7 @@
 	var launchBirdMode = function launchBirdMode(game) {
 	  window.addEventListener('keydown', function (e) {
 	    if (e.which === 66) {
+	      e.preventDefault();
 	      $('body').removeClass('jorge');
 	      game.bird.birdMode();
 	      game.pipes[0].mode = 'bird';
@@ -132,10 +133,12 @@
 	    game.bird.spacebarPress;
 	  });
 	  document.addEventListener('keydown', function (e) {
-	    if (e.which == 32) {
+	    if (e.which === 32) {
+	      e.preventDefault();
 	      game.bird.spacebarPress;
 	    }
 	  });
+
 	  game.collision.on('collisionEvent', function () {
 	    collisionSound.src = '/flappy-bird/assets/sounds/' + game.bird.mode + '-hit.ogg';
 	    collisionSound.play();
@@ -162,6 +165,13 @@
 	var Firebase = __webpack_require__(5);
 	var fireDb = new Firebase("https://flappy-jorge.firebaseio.com/");
 	var sortedScores = [];
+
+	var sortScores = function sortScores(scores) {
+	  var sorted = scores.sort(function (a, b) {
+	    return b.score - a.score;
+	  });
+	  return sorted;
+	};
 
 	var populateScoreboard = function populateScoreboard() {
 	  fireDb.child('scoreboard').on('value', function (scores) {
@@ -191,13 +201,6 @@
 
 	var appendScore = function appendScore(record, index) {
 	  $('#scoreboard').append("<tr>\n      <td>" + index + ".</td>\n      <td>" + record.name + "</td>\n      <td>" + record.score + "</td>\n    </td>");
-	};
-
-	var sortScores = function sortScores(scores) {
-	  var sorted = scores.sort(function (a, b) {
-	    return b.score - a.score;
-	  });
-	  return sorted;
 	};
 
 	module.exports = { addScore: addScore, populateScoreboard: populateScoreboard };
@@ -10333,10 +10336,8 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-	var EventEmitter = __webpack_require__(7);
 	var $ = __webpack_require__(4);
-	var Looper = __webpack_require__(1);
-	var Bird = __webpack_require__(8);
+	var Bird = __webpack_require__(7);
 	var Pipe = __webpack_require__(9);
 	var Collision = __webpack_require__(10);
 	var Ground = __webpack_require__(11);
@@ -10464,6 +10465,163 @@
 
 /***/ },
 /* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var EventEmitter = __webpack_require__(8);
+
+	var Bird = (function (_EventEmitter) {
+	  _inherits(Bird, _EventEmitter);
+
+	  function Bird(x, y, width, height, ctx) {
+	    _classCallCheck(this, Bird);
+
+	    _get(Object.getPrototypeOf(Bird.prototype), 'constructor', this).call(this);
+	    this.mode = 'bird';
+	    this.alive = true;
+	    this.momentum = 0;
+	    this.x = x;
+	    this.y = y;
+	    this.ctx = ctx;
+	    this.width = width;
+	    this.height = height;
+	    this.image = new Image();
+	    this.topLeft = { x: this.x, y: this.y };
+	    this.topRight = { x: this.x + this.width, y: this.y };
+	    this.bottomRight = { x: this.x + this.width, y: this.y + this.height };
+	    this.bottomLeft = { x: this.x, y: this.y + this.height };
+	    this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
+	    this.gravity = 0;
+	    this.frameCount = 0;
+	    this.frame = 0;
+	    this.flapSound = new Audio('/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg');
+	  }
+
+	  _createClass(Bird, [{
+	    key: 'jorgeMode',
+	    value: function jorgeMode() {
+	      this.mode = 'jorge';
+	      this.flapSound.src = '/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg';
+	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
+	    }
+	  }, {
+	    key: 'birdMode',
+	    value: function birdMode() {
+	      this.mode = 'bird';
+	      this.flapSound.src = '/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg';
+	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
+	    }
+	  }, {
+	    key: 'updateBounds',
+	    value: function updateBounds() {
+	      this.topLeft = { x: this.x, y: this.y };
+	      this.topRight = { x: this.x + this.width, y: this.y };
+	      this.bottomRight = { x: this.x + this.width, y: this.y + this.height };
+	      this.bottomLeft = { x: this.x, y: this.y + this.height };
+	    }
+	  }, {
+	    key: 'resetFrameCount',
+	    value: function resetFrameCount() {
+	      if (this.frameCount >= 60) {
+	        this.frameCount = 0;
+	      }
+	    }
+	  }, {
+	    key: 'animateBirdFrames',
+	    value: function animateBirdFrames() {
+	      this.frameCount++;
+	      if (this.firstThirdOfAnimation()) {
+	        this.drawFirstThirdOfAnimation();
+	      } else if (this.secondThirdOfAnimation()) {
+	        this.drawSecondThirdOfAnimation();
+	      } else {
+	        this.drawThirdThirdOfAnimation();
+	      }
+	    }
+	  }, {
+	    key: 'firstThirdOfAnimation',
+	    value: function firstThirdOfAnimation() {
+	      return this.frameCount > 0 && this.frameCount < 20;
+	    }
+	  }, {
+	    key: 'secondThirdOfAnimation',
+	    value: function secondThirdOfAnimation() {
+	      return this.frameCount > 20 && this.frameCount < 40;
+	    }
+	  }, {
+	    key: 'drawFirstThirdOfAnimation',
+	    value: function drawFirstThirdOfAnimation() {
+	      this.ctx.drawImage(this.image, 0, 0, 57, 60, this.x, this.y, 57, 60);
+	    }
+	  }, {
+	    key: 'drawSecondThirdOfAnimation',
+	    value: function drawSecondThirdOfAnimation() {
+	      this.ctx.drawImage(this.image, 57, 0, 57, 60, this.x, this.y, 57, 60);
+	    }
+	  }, {
+	    key: 'drawThirdThirdOfAnimation',
+	    value: function drawThirdThirdOfAnimation() {
+	      this.ctx.drawImage(this.image, 114, 0, 57, 60, this.x, this.y, 57, 60);
+	    }
+	  }, {
+	    key: 'move',
+	    get: function get() {
+	      this.gravity = this.gravity + 7;
+	      if (this.gravity > 250) {
+	        this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-down-sprite.png';
+	      }
+	      this.momentum ? this.jump : this.y = this.y + 4 * this.gravity / 150;
+	    }
+	  }, {
+	    key: 'die',
+	    get: function get() {
+	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-die.png';
+	      if (this.bottomRight.y < 525) {
+	        this.y = this.y + 10;
+	      }
+	    }
+	  }, {
+	    key: 'jump',
+	    get: function get() {
+	      this.momentum--;
+	      this.gravity = 100;
+	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
+	      this.y = this.y - 7 * this.momentum / 10;
+	    }
+	  }, {
+	    key: 'spacebarPress',
+	    get: function get() {
+	      this.flapSound.play();
+	      this.momentum = 15;
+	    }
+	  }, {
+	    key: 'draw',
+	    get: function get() {
+	      if (!this.alive) {
+	        this.ctx.drawImage(this.image, this.x, this.y);
+	      } else {
+	        this.animateBirdFrames();
+	      }
+	      this.resetFrameCount();
+	    }
+	  }]);
+
+	  return Bird;
+	})(EventEmitter);
+
+	module.exports = Bird;
+
+/***/ },
+/* 8 */
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -10767,163 +10925,6 @@
 
 
 /***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var EventEmitter = __webpack_require__(7);
-
-	var Bird = (function (_EventEmitter) {
-	  _inherits(Bird, _EventEmitter);
-
-	  function Bird(x, y, width, height, ctx) {
-	    _classCallCheck(this, Bird);
-
-	    _get(Object.getPrototypeOf(Bird.prototype), 'constructor', this).call(this);
-	    this.mode = 'bird';
-	    this.alive = true;
-	    this.momentum = 0;
-	    this.x = x;
-	    this.y = y;
-	    this.ctx = ctx;
-	    this.width = width;
-	    this.height = height;
-	    this.image = new Image();
-	    this.topLeft = { x: this.x, y: this.y };
-	    this.topRight = { x: this.x + this.width, y: this.y };
-	    this.bottomRight = { x: this.x + this.width, y: this.y + this.height };
-	    this.bottomLeft = { x: this.x, y: this.y + this.height };
-	    this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
-	    this.gravity = 0;
-	    this.frameCount = 0;
-	    this.frame = 0;
-	    this.flapSound = new Audio('/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg');
-	  }
-
-	  _createClass(Bird, [{
-	    key: 'jorgeMode',
-	    value: function jorgeMode() {
-	      this.mode = 'jorge';
-	      this.flapSound.src = '/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg';
-	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
-	    }
-	  }, {
-	    key: 'birdMode',
-	    value: function birdMode() {
-	      this.mode = 'bird';
-	      this.flapSound.src = '/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg';
-	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
-	    }
-	  }, {
-	    key: 'updateBounds',
-	    value: function updateBounds() {
-	      this.topLeft = { x: this.x, y: this.y };
-	      this.topRight = { x: this.x + this.width, y: this.y };
-	      this.bottomRight = { x: this.x + this.width, y: this.y + this.height };
-	      this.bottomLeft = { x: this.x, y: this.y + this.height };
-	    }
-	  }, {
-	    key: 'resetFrameCount',
-	    value: function resetFrameCount() {
-	      if (this.frameCount >= 60) {
-	        this.frameCount = 0;
-	      }
-	    }
-	  }, {
-	    key: 'animateBirdFrames',
-	    value: function animateBirdFrames() {
-	      this.frameCount++;
-	      if (this.firstThirdOfAnimation()) {
-	        this.drawFirstThirdOfAnimation();
-	      } else if (this.secondThirdOfAnimation()) {
-	        this.drawSecondThirdOfAnimation();
-	      } else {
-	        this.drawThirdThirdOfAnimation();
-	      }
-	    }
-	  }, {
-	    key: 'firstThirdOfAnimation',
-	    value: function firstThirdOfAnimation() {
-	      return this.frameCount > 0 && this.frameCount < 20;
-	    }
-	  }, {
-	    key: 'secondThirdOfAnimation',
-	    value: function secondThirdOfAnimation() {
-	      return this.frameCount > 20 && this.frameCount < 40;
-	    }
-	  }, {
-	    key: 'drawFirstThirdOfAnimation',
-	    value: function drawFirstThirdOfAnimation() {
-	      this.ctx.drawImage(this.image, 0, 0, 57, 60, this.x, this.y, 57, 60);
-	    }
-	  }, {
-	    key: 'drawSecondThirdOfAnimation',
-	    value: function drawSecondThirdOfAnimation() {
-	      this.ctx.drawImage(this.image, 57, 0, 57, 60, this.x, this.y, 57, 60);
-	    }
-	  }, {
-	    key: 'drawThirdThirdOfAnimation',
-	    value: function drawThirdThirdOfAnimation() {
-	      this.ctx.drawImage(this.image, 114, 0, 57, 60, this.x, this.y, 57, 60);
-	    }
-	  }, {
-	    key: 'move',
-	    get: function get() {
-	      this.gravity = this.gravity + 7;
-	      if (this.gravity > 250) {
-	        this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-down-sprite.png';
-	      }
-	      this.momentum ? this.jump : this.y = this.y + 4 * this.gravity / 150;
-	    }
-	  }, {
-	    key: 'die',
-	    get: function get() {
-	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-die.png';
-	      if (this.bottomRight.y < 525) {
-	        this.y = this.y + 10;
-	      }
-	    }
-	  }, {
-	    key: 'jump',
-	    get: function get() {
-	      this.momentum--;
-	      this.gravity = 100;
-	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
-	      this.y = this.y - 7 * this.momentum / 10;
-	    }
-	  }, {
-	    key: 'spacebarPress',
-	    get: function get() {
-	      this.flapSound.play();
-	      this.momentum = 15;
-	    }
-	  }, {
-	    key: 'draw',
-	    get: function get() {
-	      if (!this.alive) {
-	        this.ctx.drawImage(this.image, this.x, this.y);
-	      } else {
-	        this.animateBirdFrames();
-	      }
-	      this.resetFrameCount();
-	    }
-	  }]);
-
-	  return Bird;
-	})(EventEmitter);
-
-	module.exports = Bird;
-
-/***/ },
 /* 9 */
 /***/ function(module, exports) {
 
@@ -10999,7 +11000,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var EventEmitter = __webpack_require__(7);
+	var EventEmitter = __webpack_require__(8);
 
 	var Collision = (function (_EventEmitter) {
 	  _inherits(Collision, _EventEmitter);
@@ -11137,7 +11138,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var EventEmitter = __webpack_require__(7);
+	var EventEmitter = __webpack_require__(8);
 
 	var Score = (function (_EventEmitter) {
 	  _inherits(Score, _EventEmitter);

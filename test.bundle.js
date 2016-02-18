@@ -9903,6 +9903,163 @@
 /* 5 */,
 /* 6 */,
 /* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var EventEmitter = __webpack_require__(8);
+
+	var Bird = (function (_EventEmitter) {
+	  _inherits(Bird, _EventEmitter);
+
+	  function Bird(x, y, width, height, ctx) {
+	    _classCallCheck(this, Bird);
+
+	    _get(Object.getPrototypeOf(Bird.prototype), 'constructor', this).call(this);
+	    this.mode = 'bird';
+	    this.alive = true;
+	    this.momentum = 0;
+	    this.x = x;
+	    this.y = y;
+	    this.ctx = ctx;
+	    this.width = width;
+	    this.height = height;
+	    this.image = new Image();
+	    this.topLeft = { x: this.x, y: this.y };
+	    this.topRight = { x: this.x + this.width, y: this.y };
+	    this.bottomRight = { x: this.x + this.width, y: this.y + this.height };
+	    this.bottomLeft = { x: this.x, y: this.y + this.height };
+	    this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
+	    this.gravity = 0;
+	    this.frameCount = 0;
+	    this.frame = 0;
+	    this.flapSound = new Audio('/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg');
+	  }
+
+	  _createClass(Bird, [{
+	    key: 'jorgeMode',
+	    value: function jorgeMode() {
+	      this.mode = 'jorge';
+	      this.flapSound.src = '/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg';
+	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
+	    }
+	  }, {
+	    key: 'birdMode',
+	    value: function birdMode() {
+	      this.mode = 'bird';
+	      this.flapSound.src = '/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg';
+	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
+	    }
+	  }, {
+	    key: 'updateBounds',
+	    value: function updateBounds() {
+	      this.topLeft = { x: this.x, y: this.y };
+	      this.topRight = { x: this.x + this.width, y: this.y };
+	      this.bottomRight = { x: this.x + this.width, y: this.y + this.height };
+	      this.bottomLeft = { x: this.x, y: this.y + this.height };
+	    }
+	  }, {
+	    key: 'resetFrameCount',
+	    value: function resetFrameCount() {
+	      if (this.frameCount >= 60) {
+	        this.frameCount = 0;
+	      }
+	    }
+	  }, {
+	    key: 'animateBirdFrames',
+	    value: function animateBirdFrames() {
+	      this.frameCount++;
+	      if (this.firstThirdOfAnimation()) {
+	        this.drawFirstThirdOfAnimation();
+	      } else if (this.secondThirdOfAnimation()) {
+	        this.drawSecondThirdOfAnimation();
+	      } else {
+	        this.drawThirdThirdOfAnimation();
+	      }
+	    }
+	  }, {
+	    key: 'firstThirdOfAnimation',
+	    value: function firstThirdOfAnimation() {
+	      return this.frameCount > 0 && this.frameCount < 20;
+	    }
+	  }, {
+	    key: 'secondThirdOfAnimation',
+	    value: function secondThirdOfAnimation() {
+	      return this.frameCount > 20 && this.frameCount < 40;
+	    }
+	  }, {
+	    key: 'drawFirstThirdOfAnimation',
+	    value: function drawFirstThirdOfAnimation() {
+	      this.ctx.drawImage(this.image, 0, 0, 57, 60, this.x, this.y, 57, 60);
+	    }
+	  }, {
+	    key: 'drawSecondThirdOfAnimation',
+	    value: function drawSecondThirdOfAnimation() {
+	      this.ctx.drawImage(this.image, 57, 0, 57, 60, this.x, this.y, 57, 60);
+	    }
+	  }, {
+	    key: 'drawThirdThirdOfAnimation',
+	    value: function drawThirdThirdOfAnimation() {
+	      this.ctx.drawImage(this.image, 114, 0, 57, 60, this.x, this.y, 57, 60);
+	    }
+	  }, {
+	    key: 'move',
+	    get: function get() {
+	      this.gravity = this.gravity + 7;
+	      if (this.gravity > 250) {
+	        this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-down-sprite.png';
+	      }
+	      this.momentum ? this.jump : this.y = this.y + 4 * this.gravity / 150;
+	    }
+	  }, {
+	    key: 'die',
+	    get: function get() {
+	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-die.png';
+	      if (this.bottomRight.y < 525) {
+	        this.y = this.y + 10;
+	      }
+	    }
+	  }, {
+	    key: 'jump',
+	    get: function get() {
+	      this.momentum--;
+	      this.gravity = 100;
+	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
+	      this.y = this.y - 7 * this.momentum / 10;
+	    }
+	  }, {
+	    key: 'spacebarPress',
+	    get: function get() {
+	      this.flapSound.play();
+	      this.momentum = 15;
+	    }
+	  }, {
+	    key: 'draw',
+	    get: function get() {
+	      if (!this.alive) {
+	        this.ctx.drawImage(this.image, this.x, this.y);
+	      } else {
+	        this.animateBirdFrames();
+	      }
+	      this.resetFrameCount();
+	    }
+	  }]);
+
+	  return Bird;
+	})(EventEmitter);
+
+	module.exports = Bird;
+
+/***/ },
+/* 8 */
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -10206,163 +10363,6 @@
 
 
 /***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var EventEmitter = __webpack_require__(7);
-
-	var Bird = (function (_EventEmitter) {
-	  _inherits(Bird, _EventEmitter);
-
-	  function Bird(x, y, width, height, ctx) {
-	    _classCallCheck(this, Bird);
-
-	    _get(Object.getPrototypeOf(Bird.prototype), 'constructor', this).call(this);
-	    this.mode = 'bird';
-	    this.alive = true;
-	    this.momentum = 0;
-	    this.x = x;
-	    this.y = y;
-	    this.ctx = ctx;
-	    this.width = width;
-	    this.height = height;
-	    this.image = new Image();
-	    this.topLeft = { x: this.x, y: this.y };
-	    this.topRight = { x: this.x + this.width, y: this.y };
-	    this.bottomRight = { x: this.x + this.width, y: this.y + this.height };
-	    this.bottomLeft = { x: this.x, y: this.y + this.height };
-	    this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
-	    this.gravity = 0;
-	    this.frameCount = 0;
-	    this.frame = 0;
-	    this.flapSound = new Audio('/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg');
-	  }
-
-	  _createClass(Bird, [{
-	    key: 'jorgeMode',
-	    value: function jorgeMode() {
-	      this.mode = 'jorge';
-	      this.flapSound.src = '/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg';
-	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
-	    }
-	  }, {
-	    key: 'birdMode',
-	    value: function birdMode() {
-	      this.mode = 'bird';
-	      this.flapSound.src = '/flappy-bird/assets/sounds/' + this.mode + '-wing.ogg';
-	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
-	    }
-	  }, {
-	    key: 'updateBounds',
-	    value: function updateBounds() {
-	      this.topLeft = { x: this.x, y: this.y };
-	      this.topRight = { x: this.x + this.width, y: this.y };
-	      this.bottomRight = { x: this.x + this.width, y: this.y + this.height };
-	      this.bottomLeft = { x: this.x, y: this.y + this.height };
-	    }
-	  }, {
-	    key: 'resetFrameCount',
-	    value: function resetFrameCount() {
-	      if (this.frameCount >= 60) {
-	        this.frameCount = 0;
-	      }
-	    }
-	  }, {
-	    key: 'animateBirdFrames',
-	    value: function animateBirdFrames() {
-	      this.frameCount++;
-	      if (this.firstThirdOfAnimation()) {
-	        this.drawFirstThirdOfAnimation();
-	      } else if (this.secondThirdOfAnimation()) {
-	        this.drawSecondThirdOfAnimation();
-	      } else {
-	        this.drawThirdThirdOfAnimation();
-	      }
-	    }
-	  }, {
-	    key: 'firstThirdOfAnimation',
-	    value: function firstThirdOfAnimation() {
-	      return this.frameCount > 0 && this.frameCount < 20;
-	    }
-	  }, {
-	    key: 'secondThirdOfAnimation',
-	    value: function secondThirdOfAnimation() {
-	      return this.frameCount > 20 && this.frameCount < 40;
-	    }
-	  }, {
-	    key: 'drawFirstThirdOfAnimation',
-	    value: function drawFirstThirdOfAnimation() {
-	      this.ctx.drawImage(this.image, 0, 0, 57, 60, this.x, this.y, 57, 60);
-	    }
-	  }, {
-	    key: 'drawSecondThirdOfAnimation',
-	    value: function drawSecondThirdOfAnimation() {
-	      this.ctx.drawImage(this.image, 57, 0, 57, 60, this.x, this.y, 57, 60);
-	    }
-	  }, {
-	    key: 'drawThirdThirdOfAnimation',
-	    value: function drawThirdThirdOfAnimation() {
-	      this.ctx.drawImage(this.image, 114, 0, 57, 60, this.x, this.y, 57, 60);
-	    }
-	  }, {
-	    key: 'move',
-	    get: function get() {
-	      this.gravity = this.gravity + 7;
-	      if (this.gravity > 250) {
-	        this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-down-sprite.png';
-	      }
-	      this.momentum ? this.jump : this.y = this.y + 4 * this.gravity / 150;
-	    }
-	  }, {
-	    key: 'die',
-	    get: function get() {
-	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-die.png';
-	      if (this.bottomRight.y < 525) {
-	        this.y = this.y + 10;
-	      }
-	    }
-	  }, {
-	    key: 'jump',
-	    get: function get() {
-	      this.momentum--;
-	      this.gravity = 100;
-	      this.image.src = '/flappy-bird/assets/images/flappy-' + this.mode + '-up-sprite.png';
-	      this.y = this.y - 7 * this.momentum / 10;
-	    }
-	  }, {
-	    key: 'spacebarPress',
-	    get: function get() {
-	      this.flapSound.play();
-	      this.momentum = 15;
-	    }
-	  }, {
-	    key: 'draw',
-	    get: function get() {
-	      if (!this.alive) {
-	        this.ctx.drawImage(this.image, this.x, this.y);
-	      } else {
-	        this.animateBirdFrames();
-	      }
-	      this.resetFrameCount();
-	    }
-	  }]);
-
-	  return Bird;
-	})(EventEmitter);
-
-	module.exports = Bird;
-
-/***/ },
 /* 9 */
 /***/ function(module, exports) {
 
@@ -10438,7 +10438,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var EventEmitter = __webpack_require__(7);
+	var EventEmitter = __webpack_require__(8);
 
 	var Collision = (function (_EventEmitter) {
 	  _inherits(Collision, _EventEmitter);
@@ -10576,7 +10576,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var EventEmitter = __webpack_require__(7);
+	var EventEmitter = __webpack_require__(8);
 
 	var Score = (function (_EventEmitter) {
 	  _inherits(Score, _EventEmitter);
@@ -10917,7 +10917,7 @@
 
 	var Chai = __webpack_require__(23);
 	var assert = Chai.assert;
-	var Bird = __webpack_require__(8);
+	var Bird = __webpack_require__(7);
 
 	describe('Bird', function () {
 	  context('new', function () {
@@ -10932,19 +10932,19 @@
 	  });
 
 	  context('move functionality', function () {
-	    it('should increment 4', function () {
+	    it('should increment', function () {
 	      var bird = new Bird(50, 50, 50, 57);
 	      bird.move;
 
-	      assert.equal(54, bird.y);
+	      assert.isAbove(bird.y, 50);
 	    });
 
-	    it('should decrement 4', function () {
+	    it('should decrement', function () {
 	      var bird = new Bird(50, 50, 50, 57);
 	      bird.momentum = 10;
 	      bird.move;
 
-	      assert.equal(46, bird.y);
+	      assert.isBelow(bird.y, 50);
 	    });
 
 	    it('should set momentum to 15', function () {
@@ -10975,10 +10975,10 @@
 	      bird.move;
 	      bird.updateBounds();
 
-	      assert.equal(46, bird.topLeft.y);
-	      assert.equal(46, bird.topRight.y);
-	      assert.equal(103, bird.bottomRight.y);
-	      assert.equal(103, bird.bottomLeft.y);
+	      assert.isBelow(bird.topLeft.y, 50);
+	      assert.isBelow(bird.topRight.y, 50);
+	      assert.isBelow(bird.bottomRight.y, 107);
+	      assert.isBelow(bird.bottomLeft.y, 107);
 	    });
 
 	    it('should increment Y coords on move down', function () {
@@ -10986,10 +10986,10 @@
 	      bird.move;
 	      bird.updateBounds();
 
-	      assert.equal(54, bird.topLeft.y);
-	      assert.equal(54, bird.topRight.y);
-	      assert.equal(111, bird.bottomRight.y);
-	      assert.equal(111, bird.bottomLeft.y);
+	      assert.isAbove(bird.topLeft.y, 50);
+	      assert.isAbove(bird.topRight.y, 50);
+	      assert.isAbove(bird.bottomRight.y, 107);
+	      assert.isAbove(bird.bottomLeft.y, 107);
 	    });
 
 	    it('should not affect X coords on move', function () {
@@ -19107,7 +19107,7 @@
 
 	      assert.equal(500, pipe.x);
 	      pipe.move;
-	      assert.equal(498, pipe.x);
+	      assert.equal(497, pipe.x);
 	    });
 
 	    it('resets', function () {
@@ -19116,7 +19116,7 @@
 	        pipe.move;
 	        pipe.updateBounds();
 	      }
-	      assert.equal(498, pipe.x);
+	      assert.equal(446, pipe.x);
 	    });
 	  });
 
@@ -19135,10 +19135,10 @@
 	      pipe.move;
 	      pipe.updateBounds();
 
-	      assert.equal(498, pipe.topLeft.x);
-	      assert.equal(600, pipe.topRight.x);
-	      assert.equal(600, pipe.bottomRight.x);
-	      assert.equal(498, pipe.bottomLeft.x);
+	      assert.equal(497, pipe.topLeft.x);
+	      assert.equal(599, pipe.topRight.x);
+	      assert.equal(599, pipe.bottomRight.x);
+	      assert.equal(497, pipe.bottomLeft.x);
 	    });
 	  });
 	});
@@ -19152,7 +19152,7 @@
 	var Chai = __webpack_require__(23);
 	var assert = Chai.assert;
 	var Collision = __webpack_require__(10);
-	var Bird = __webpack_require__(8);
+	var Bird = __webpack_require__(7);
 	var Pipe = __webpack_require__(9);
 	var Ground = __webpack_require__(11);
 
@@ -19202,7 +19202,7 @@
 	var assert = Chai.assert;
 	var Score = __webpack_require__(12);
 	var Pipe = __webpack_require__(9);
-	var Bird = __webpack_require__(8);
+	var Bird = __webpack_require__(7);
 	var $ = __webpack_require__(4);
 
 	describe('Score', function () {
@@ -19216,18 +19216,18 @@
 
 	  context('tracking', function () {
 	    it('increments when bird moves through pipe', function () {
-	      var score = new Score($);
 	      var bird = new Bird(240, 270, 50, 57, context);
-	      var pipes = [new Pipe(context, 192)];
+	      var score = new Score($, bird);
+	      var pipes = [new Pipe(context, 191)];
 	      score.increment;
 	      pipes.forEach(function (pipe) {
 	        pipe.move;
 	        pipe.updateBounds();
-	        if (pipe.x + 50 === bird.x) {
+	        if (pipe.x + 52 === bird.x) {
 	          score.emit('incrementScoreEvent');
 	        }
 	      });
-	      assert(score.score, 1);
+	      assert.equal(score.score, 1);
 	    });
 	  });
 	});

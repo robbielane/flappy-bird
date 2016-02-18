@@ -32,5 +32,6 @@
   "eqnull": true,
   "esnext": true,
   "unused": true,
-  "mocha": true
+  "mocha": true,
+  "expr": true
 }
