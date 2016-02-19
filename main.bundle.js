@@ -10068,7 +10068,11 @@
 	};
 
 	var updateScoreboard = function updateScoreboard(score) {
-	  sortedScores.push({ name: $('#name').val(), score: score });
+	  var name = $('#name').val();
+	  if (name.length > 20) {
+	    name.slice(0, 20);
+	  }
+	  sortedScores.push({ name: name, score: score });
 	  sortScores(sortedScores);
 	  fireDb.set({ scoreboard: sortedScores.slice(0, 5) });
 	  $('.form').children().remove();
